@@ -1,0 +1,11 @@
+{
+  "add-todo": {
+    "text": "Prepare for meeting",
+    "priority": "high",
+    "type": "Work"
+  },
+  "get-todos": {
+    "priority": "high",
+    "type": "Work"
+  }
+} 

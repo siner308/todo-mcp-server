@@ -24,15 +24,15 @@ server.tool(
     text: z.string(),
     priority: z.enum(['low', 'medium', 'high']).optional(),
     type: z.string().optional(),
+    done: z.boolean().optional(),
   },
-  async ({text, priority = 'medium', type = 'General'}) => {
-    const todo = dbOperations.addTodo(text, priority, type);
-
+  async ({text, priority = 'medium', type = 'general', done = false}) => {
+    const todo = dbOperations.addTodo(text, priority, type, done);
     return {
       content: [
         {
           type: "text",
-          text: `${text} (priority: ${priority}, type: ${type}) was added to our todo with ID ${todo.id}`
+          text: `${text} (priority: ${priority}, type: ${type}, done: ${done}) was added to our todo with ID ${todo.id}`
         }
       ]
     }
@@ -44,10 +44,10 @@ server.tool(
   {
     priority: z.enum(['low', 'medium', 'high']).optional(),
     type: z.string().optional(),
+    done: z.boolean().optional(),
   },
-  async ({ priority, type }) => {
-    const todos = dbOperations.getTodos(priority, type);
-
+  async ({ priority, type, done }) => {
+    const todos = dbOperations.getTodos(priority, type, done);
     if (todos.length === 0) {
       return {
         content: [
@@ -58,9 +58,7 @@ server.tool(
         ]
       }
     }
-
-    const todoList = todos.map((todo) => `${todo.id}: ${todo.text} [priority: ${todo.priority}, type: ${todo.type}]`).join("\n");
-
+    const todoList = todos.map((todo) => `${todo.id}: ${todo.text} [priority: ${todo.priority}, type: ${todo.type}, done: ${todo.done}]`).join("\n");
     return {
       content: [
         {
@@ -109,9 +107,10 @@ server.tool(
     text: z.string().optional(),
     priority: z.enum(['low', 'medium', 'high']).optional(),
     type: z.string().optional(),
+    done: z.boolean().optional(),
   },
-  async ({ id, text, priority, type }) => {
-    const success = dbOperations.modifyTodo(id, { text, priority, type });
+  async ({ id, text, priority, type, done }) => {
+    const success = dbOperations.modifyTodo(id, { text, priority, type, done });
     if (!success) {
       return {
         content: [

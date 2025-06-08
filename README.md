@@ -1,8 +1,10 @@
 # todo-mcp-server
 
+A simple, MCP-compatible todo server with SQLite, supporting priority, type, due date, and npx usage.
+
 ## Features
-- Add, get, modify, remove todo
-- Mark todo as done/undone
+- Add, get, modify, remove todos
+- Mark todos as done/undone
 - Set priority (low/medium/high) and type (work, study, etc.)
 - Set due date, track creation date
 - Filter by priority, type, done status
@@ -21,11 +23,13 @@
 }
 ```
 
-## How to Setup (for local build)
+## How to Build & Run Locally
 ```bash
-# Node.js v16 환경이 필요합니다. (sqlite 호환)
-# nvm 등으로 Node 16을 준비하세요.
+# Requires Node.js v16 (for sqlite compatibility)
 nvm use v16
 npm i
 npm run build
 ```
+
+## License
+MIT

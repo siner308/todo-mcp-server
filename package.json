@@ -1,6 +1,16 @@
 {
-  "name": "todo-mcp-server",
-  "version": "1.0.2",
+  "name": "@siner308/todo-mcp-server",
+  "version": "1.0.0",
+  "description": "A simple, MCP-compatible todo server with SQLite, priority, type, due date, and npx support.",
+  "keywords": [
+    "todo",
+    "mcp",
+    "server",
+    "sqlite",
+    "npx"
+  ],
+  "author": "siner308",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "todo-mcp-server": "./build/index.js"

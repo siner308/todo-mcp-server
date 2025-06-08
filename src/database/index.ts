@@ -1,8 +1,13 @@
 import Database from "better-sqlite3";
 import { existsSync, mkdirSync } from "fs";
-import { join } from "path";
+import { join, resolve } from "path";
+import { tmpdir } from "os";
 
-const dataDir = join(__dirname, "../../data");
+const dataDir = process.env.MCP_DATA_DIR
+  ? resolve(process.env.MCP_DATA_DIR)
+  : process.env.TODO_DATA_DIR
+    ? resolve(process.env.TODO_DATA_DIR)
+    : join(tmpdir(), "todo-mcp-server");
 if (!existsSync(dataDir)) {
   mkdirSync(dataDir, { recursive: true });
 }

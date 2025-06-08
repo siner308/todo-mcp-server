@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 import { existsSync, mkdirSync } from "fs";
 import { join, resolve } from "path";
 import { tmpdir } from "os";
+import { migrateTodosTable } from './todo/migration.js';
 
 const dataDir = process.env.DATA_DIR
   ? resolve(process.env.DATA_DIR)
@@ -11,6 +12,8 @@ if (!existsSync(dataDir)) {
 }
 const dbPath = join(dataDir, "todo.db");
 const db = Database(dbPath);
+
+migrateTodosTable(db);
 
 export default db;
 

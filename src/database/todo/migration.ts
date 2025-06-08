@@ -1,6 +1,6 @@
-import db from '../index.js';
+import Database from "better-sqlite3";
 
-export function migrateTodosTable() {
+export function migrateTodosTable(db: Database.Database) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS todos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

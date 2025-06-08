@@ -14,10 +14,33 @@ A simple, MCP-compatible todo server with SQLite, supporting priority, type, due
 {
   "mcpServers": {
     "todo": {
-      "command": "/path/to/node",
+      "command": "npx",
       "args": [
-        "/path/to/todo-mcp-server/build/index.js"
+        "-y",
+        "@siner308/todo-mcp-server"
       ]
+    }
+  }
+}
+```
+
+## Data Directory (Optional)
+By default, data is stored in a temporary directory (e.g., `/tmp/todo-mcp-server`).
+To specify a custom data directory, set the `DATA_DIR` environment variable:
+
+### MCP Server Example with env
+```json
+{
+  "mcpServers": {
+    "todo": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@siner308/todo-mcp-server"
+      ],
+      "env": {
+        "DATA_DIR": "/your/data/dir"
+      }
     }
   }
 }

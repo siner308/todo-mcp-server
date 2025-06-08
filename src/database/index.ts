@@ -3,11 +3,9 @@ import { existsSync, mkdirSync } from "fs";
 import { join, resolve } from "path";
 import { tmpdir } from "os";
 
-const dataDir = process.env.MCP_DATA_DIR
-  ? resolve(process.env.MCP_DATA_DIR)
-  : process.env.TODO_DATA_DIR
-    ? resolve(process.env.TODO_DATA_DIR)
-    : join(tmpdir(), "todo-mcp-server");
+const dataDir = process.env.DATA_DIR
+  ? resolve(process.env.DATA_DIR)
+  : join(tmpdir(), "todo-mcp-server");
 if (!existsSync(dataDir)) {
   mkdirSync(dataDir, { recursive: true });
 }

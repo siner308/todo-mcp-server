@@ -1,7 +1,7 @@
-import db from '../index.js';
+import { getDb } from '../index.js';
 
-export function removeTodo(id: number): boolean {
-  const stmt = db.prepare("DELETE FROM todos WHERE id = ?");
-  const info = stmt.run(id);
-  return info.changes > 0;
+export async function removeTodo(id: number): Promise<boolean> {
+  const db = await getDb();
+  const result = await db.run("DELETE FROM todos WHERE id = ?", id);
+  return (result.changes ?? 0) > 0;
 } 

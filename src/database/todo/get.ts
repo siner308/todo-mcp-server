@@ -1,4 +1,4 @@
-import db from '../index.js';
+import { getDb } from '../index.js';
 import { Todo } from './model.js';
 
 function buildSelectTodosQuery(
@@ -28,15 +28,15 @@ function buildSelectTodosQuery(
   return { query, params };
 }
 
-export function getTodos(
+export async function getTodos(
   priority?: 'low' | 'medium' | 'high',
   type?: string,
   done?: boolean
-): Todo[] {
+): Promise<Todo[]> {
+  const db = await getDb();
   const normalizedType = type ? type.toLowerCase() : undefined;
   const { query, params } = buildSelectTodosQuery(priority, normalizedType, done);
-  const stmt = db.prepare(query);
-  const rows = stmt.all(...params);
+  const rows = await db.all(query, ...params);
   return rows.map((row: any) => ({
     id: row.id,
     text: row.text,

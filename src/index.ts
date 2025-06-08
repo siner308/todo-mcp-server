@@ -40,7 +40,7 @@ server.tool(
 When a user adds a todo item and does not specify the type, infer the most appropriate type from the todo's text and assign it automatically. For example, if the text is about eating or coffee, set type to "meal"; if it's about studying, set type to "study"; if it's about work, set type to "work"; if it's about a meeting or appointment, set type to "meeting". If you cannot infer, use "general".`
   },
   async ({text, priority = 'medium', type = 'general', done = false, due_at}) => {
-    const todo = dbOperations.addTodo(text, priority, type, done, due_at);
+    const todo = await dbOperations.addTodo(text, priority, type, done, due_at);
     return {
       content: [
         {
@@ -65,7 +65,7 @@ server.tool(
 - Each todo includes id, text, priority, type, done, created_at, and due_at fields.`
   },
   async ({ priority, type, done }) => {
-    const todos = dbOperations.getTodos(priority, type, done);
+    const todos = await dbOperations.getTodos(priority, type, done);
     if (todos.length === 0) {
       return {
         content: [
@@ -98,7 +98,7 @@ server.tool(
 - Returns a success message if the todo was found and removed, or an error message if not found.`
   },
   async ({id}) => {
-    const success = dbOperations.removeTodo(id);
+    const success = await dbOperations.removeTodo(id);
 
     if (!success) {
       return {
@@ -138,7 +138,7 @@ server.tool(
 - Returns a success message if the todo was found and updated, or an error message if not found or no fields to update.`
   },
   async ({ id, text, priority, type, done, due_at }) => {
-    const success = dbOperations.modifyTodo(id, { text, priority, type, done, due_at });
+    const success = await dbOperations.modifyTodo(id, { text, priority, type, done, due_at });
     if (!success) {
       return {
         content: [

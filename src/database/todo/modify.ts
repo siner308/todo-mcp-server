@@ -1,10 +1,11 @@
-import db from '../index.js';
+import { getDb } from '../index.js';
 import { Todo } from './model.js';
 
-export function modifyTodo(
+export async function modifyTodo(
   id: number,
   fields: { text?: string; priority?: 'low' | 'medium' | 'high'; type?: string; done?: boolean; due_at?: string | null }
-): boolean {
+): Promise<boolean> {
+  const db = await getDb();
   const updates: string[] = [];
   const params: any[] = [];
   if (fields.text !== undefined) {
@@ -29,7 +30,6 @@ export function modifyTodo(
   }
   if (updates.length === 0) return false;
   params.push(id);
-  const stmt = db.prepare(`UPDATE todos SET ${updates.join(", ")} WHERE id = ?`);
-  const info = stmt.run(...params);
-  return info.changes > 0;
+  const result = await db.run(`UPDATE todos SET ${updates.join(", ")} WHERE id = ?`, ...params);
+  return (result.changes ?? 0) > 0;
 } 

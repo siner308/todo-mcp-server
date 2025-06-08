@@ -1,7 +1,7 @@
-import Database from "better-sqlite3";
+import { Database } from 'sqlite';
 
-export function migrateTodosTable(db: Database.Database) {
-  db.exec(`
+export async function migrateTodosTable(db: Database) {
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS todos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       text TEXT NOT NULL,
@@ -13,18 +13,18 @@ export function migrateTodosTable(db: Database.Database) {
     )
   `);
   try {
-    db.prepare("ALTER TABLE todos ADD COLUMN priority TEXT NOT NULL DEFAULT 'medium'").run();
+    await db.exec("ALTER TABLE todos ADD COLUMN priority TEXT NOT NULL DEFAULT 'medium'");
   } catch (_) {}
   try {
-    db.prepare("ALTER TABLE todos ADD COLUMN type TEXT NOT NULL DEFAULT 'general'").run();
+    await db.exec("ALTER TABLE todos ADD COLUMN type TEXT NOT NULL DEFAULT 'general'");
   } catch (_) {}
   try {
-    db.prepare("ALTER TABLE todos ADD COLUMN done INTEGER NOT NULL DEFAULT 0").run();
+    await db.exec("ALTER TABLE todos ADD COLUMN done INTEGER NOT NULL DEFAULT 0");
   } catch (_) {}
   try {
-    db.prepare("ALTER TABLE todos ADD COLUMN created_at TEXT NOT NULL DEFAULT (datetime('now'))").run();
+    await db.exec("ALTER TABLE todos ADD COLUMN created_at TEXT NOT NULL DEFAULT (datetime('now'))");
   } catch (_) {}
   try {
-    db.prepare("ALTER TABLE todos ADD COLUMN due_at TEXT").run();
+    await db.exec("ALTER TABLE todos ADD COLUMN due_at TEXT");
   } catch (_) {}
 } 

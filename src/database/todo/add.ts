@@ -1,17 +1,20 @@
-import db from '../index.js';
+import { getDb } from '../index.js';
 import { Todo } from './model.js';
 
-export function addTodo(
+export async function addTodo(
   text: string,
   priority: 'low' | 'medium' | 'high' = 'medium',
   type: string = 'general',
   done: boolean = false,
   due_at?: string | null
-): Todo {
+): Promise<Todo> {
+  const db = await getDb();
   const normalizedType = type.toLowerCase();
-  const stmt = db.prepare("INSERT INTO todos (text, priority, type, done, due_at) VALUES (?, ?, ?, ?, ?)");
-  const info = stmt.run(text, priority, normalizedType, done ? 1 : 0, due_at ?? null);
-  const row = db.prepare("SELECT * FROM todos WHERE id = ?").get(info.lastInsertRowid) as any;
+  const result = await db.run(
+    "INSERT INTO todos (text, priority, type, done, due_at) VALUES (?, ?, ?, ?, ?)",
+    text, priority, normalizedType, done ? 1 : 0, due_at ?? null
+  );
+  const row = await db.get("SELECT * FROM todos WHERE id = ?", result.lastID);
   return {
     id: row.id,
     text: row.text,

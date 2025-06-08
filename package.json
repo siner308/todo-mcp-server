@@ -1,6 +1,6 @@
 {
   "name": "@siner308/todo-mcp-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A simple, MCP-compatible todo server with SQLite, priority, type, due date, and npx support.",
   "keywords": [
     "todo",

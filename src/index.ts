@@ -7,15 +7,17 @@ import * as dbOperations from "./database/index.js";
 const server = new McpServer({
   name: "TODO",
   version: "1.0.0",
-  prompt: `
-    사용자가 할 일을 추가할 때 type을 명시하지 않으면, 텍스트를 보고 가장 적절한 type을 추론해서 자동으로 할당하세요.
-    예를 들어, 밥/식사/먹기 관련이면 type을 "meal", 공부/학습/시험 관련이면 "study", 업무/회의/보고 관련이면 "work"로 하세요.
-    판단이 어려우면 "general"을 사용하세요.
+  prompt: `You are a personal todo assistant.
+When a user adds a todo item and does not specify the type, infer the most appropriate type from the todo's text and assign it automatically.
+For example:
+- If the text is about eating or coffee, set type to "meal".
+- If it's about studying, set type to "study".
+- If it's about work, set type to "work".
+- If it's about a meeting or appointment, set type to "meeting".
+- If you cannot infer, use "general".
 
-    When a user adds a todo item and does not specify the type, infer the most appropriate type from the todo's text and assign it automatically.
-    For example, if the text is about eating, set type to "meal"; if it's about studying, set type to "study"; if it's about work, set type to "work".
-    If you cannot infer, use "general".
-  `
+Always provide clear, concise, and helpful responses.
+Support adding, modifying, removing, and listing todos, including priority, type, due date, and completion status.`
 });
 
 // Add Tools
@@ -26,14 +28,24 @@ server.tool(
     priority: z.enum(['low', 'medium', 'high']).optional(),
     type: z.string().optional(),
     done: z.boolean().optional(),
+    due_at: z.string().optional(),
   },
-  async ({text, priority = 'medium', type = 'general', done = false}) => {
-    const todo = dbOperations.addTodo(text, priority, type, done);
+  {
+    description: `Adds a new todo item.
+- If type is not specified, it will be inferred from the text (see below).
+- You can set priority ("low", "medium", "high"), due date (ISO8601 string), and done status (default: false).
+- If you do not specify a due date, it will be unset.
+- If you do not specify priority, it will default to "medium".
+
+When a user adds a todo item and does not specify the type, infer the most appropriate type from the todo's text and assign it automatically. For example, if the text is about eating or coffee, set type to "meal"; if it's about studying, set type to "study"; if it's about work, set type to "work"; if it's about a meeting or appointment, set type to "meeting". If you cannot infer, use "general".`
+  },
+  async ({text, priority = 'medium', type = 'general', done = false, due_at}) => {
+    const todo = dbOperations.addTodo(text, priority, type, done, due_at);
     return {
       content: [
         {
           type: "text",
-          text: `${text} (priority: ${priority}, type: ${type}, done: ${done}) was added to our todo with ID ${todo.id}`
+          text: `${text} (priority: ${priority}, type: ${type}, done: ${done}, due_at: ${due_at ?? '없음'}) was added to our todo with ID ${todo.id}`
         }
       ]
     }
@@ -48,7 +60,9 @@ server.tool(
     done: z.boolean().optional(),
   },
   {
-    description: `할 일 목록은 id 내림차순(최신순)으로 정렬되어 반환됩니다. id 순서는 생성일(created_at) 순서와 동일합니다. id가 작을수록 오래된 할 일, id가 클수록 최근 할 일입니다.\n\nThe todo list is returned in descending order of id (most recent first). The order of ids is the same as the order of creation (created_at). A smaller id means an older todo, and a larger id means a more recent todo.`
+    description: `Returns a list of todo items, sorted by id in descending order (most recent first).
+- You can filter by priority ("low", "medium", "high"), type (string), and done status (true/false).
+- Each todo includes id, text, priority, type, done, created_at, and due_at fields.`
   },
   async ({ priority, type, done }) => {
     const todos = dbOperations.getTodos(priority, type, done);
@@ -78,6 +92,10 @@ server.tool(
   "remove-todo",
   {
     id: z.number(),
+  },
+  {
+    description: `Removes a todo item by its id.
+- Returns a success message if the todo was found and removed, or an error message if not found.`
   },
   async ({id}) => {
     const success = dbOperations.removeTodo(id);
@@ -112,9 +130,15 @@ server.tool(
     priority: z.enum(['low', 'medium', 'high']).optional(),
     type: z.string().optional(),
     done: z.boolean().optional(),
+    due_at: z.string().optional(),
   },
-  async ({ id, text, priority, type, done }) => {
-    const success = dbOperations.modifyTodo(id, { text, priority, type, done });
+  {
+    description: `Modifies an existing todo item by id.
+- You can update text, priority, type, done status, and due date (due_at).
+- Returns a success message if the todo was found and updated, or an error message if not found or no fields to update.`
+  },
+  async ({ id, text, priority, type, done, due_at }) => {
+    const success = dbOperations.modifyTodo(id, { text, priority, type, done, due_at });
     if (!success) {
       return {
         content: [
@@ -129,7 +153,7 @@ server.tool(
       content: [
         {
           type: "text",
-          text: `Todo ${id} was updated.`
+          text: `Todo ${id} was updated.${due_at ? ` (due_at: ${due_at})` : ''}`
         }
       ]
     }

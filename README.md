@@ -48,8 +48,6 @@ To specify a custom data directory, set the `DATA_DIR` environment variable:
 
 ## How to Build & Run Locally
 ```bash
-# Requires Node.js v16 (for sqlite compatibility)
-nvm use v16
 npm i
 npm run build
 ```

@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from "zod";
-import { dbOperations } from "./database.js";
+import * as dbOperations from "./database/index.js";
 
 const server = new McpServer({
   name: "TODO",
@@ -45,6 +45,9 @@ server.tool(
     priority: z.enum(['low', 'medium', 'high']).optional(),
     type: z.string().optional(),
     done: z.boolean().optional(),
+  },
+  {
+    description: `할 일 목록은 id 내림차순(최신순)으로 정렬되어 반환됩니다. id 순서는 생성일(created_at) 순서와 동일합니다. id가 작을수록 오래된 할 일, id가 클수록 최근 할 일입니다.\n\nThe todo list is returned in descending order of id (most recent first). The order of ids is the same as the order of creation (created_at). A smaller id means an older todo, and a larger id means a more recent todo.`
   },
   async ({ priority, type, done }) => {
     const todos = dbOperations.getTodos(priority, type, done);
